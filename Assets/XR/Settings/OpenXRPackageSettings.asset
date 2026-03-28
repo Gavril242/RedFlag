@@ -395,7 +395,7 @@ MonoBehaviour:
   m_Name: Standalone
   m_EditorClassIdentifier: 
   features:
-  - {fileID: 6500825779523638199}
+  - {fileID: 4099898977813760892}
   - {fileID: 7036184732561170184}
   - {fileID: 4793017958070210049}
   - {fileID: 8865912026230431239}
@@ -412,17 +412,17 @@ MonoBehaviour:
   - {fileID: -3417615191098609170}
   - {fileID: 7556313881549638518}
   - {fileID: 7930990923307746699}
-  - {fileID: 3480220022524828215}
-  - {fileID: 7971809749908477774}
-  - {fileID: 3247901181314861712}
-  - {fileID: 1719021565972577234}
+  - {fileID: 633199196199715490}
+  - {fileID: 5789840804326650863}
+  - {fileID: -7323858377259845203}
+  - {fileID: -5366424564110265686}
   - {fileID: 5159939376808632448}
-  - {fileID: 7032481137799104357}
-  - {fileID: 6696394819145702929}
+  - {fileID: -7936470500193948812}
+  - {fileID: 1287185478433949296}
   - {fileID: -2589091030702169456}
-  - {fileID: 2042613992770130105}
-  - {fileID: -7460357349458795620}
-  - {fileID: -5509327660117288027}
+  - {fileID: 4459740260581005389}
+  - {fileID: -3751639061014600085}
+  - {fileID: -8284160343827973960}
   - {fileID: 6456907066911905399}
   - {fileID: 7825686016705212628}
   - {fileID: 1038442320976035168}
@@ -463,7 +463,7 @@ MonoBehaviour:
   nameUi: 'Meta Quest: Occlusion'
   version: 0.1.0
   featureIdInternal: com.unity.openxr.feature.arfoundation-meta-occlusion
-  openxrExtensionStrings: XR_META_environment_depth XR_KHR_vulkan_enable
+  openxrExtensionStrings: XR_META_environment_depth
   company: Unity Technologies
   priority: 0
   targetOpenXRApiVersion: 
@@ -1037,7 +1037,7 @@ MonoBehaviour:
   m_Name: Android
   m_EditorClassIdentifier: 
   features:
-  - {fileID: -2691841992073268077}
+  - {fileID: -2736011490309855772}
   - {fileID: 690340776572079766}
   - {fileID: 1511924353053015415}
   - {fileID: 2432278150781924076}
@@ -1066,17 +1066,17 @@ MonoBehaviour:
   - {fileID: 4859721307576298024}
   - {fileID: -3416010835614318235}
   - {fileID: 4813506467478316222}
-  - {fileID: -2438849359260552081}
-  - {fileID: 3271118392653974798}
-  - {fileID: -158339578740508157}
-  - {fileID: 2146807134263679403}
+  - {fileID: -5583717022038261086}
+  - {fileID: -8935718964888889440}
+  - {fileID: 494607505047361158}
+  - {fileID: 6228700292793460090}
   - {fileID: -4636904329590610914}
-  - {fileID: -7690885392514794505}
-  - {fileID: -3137280174111084683}
-  - {fileID: 6299677241848960563}
-  - {fileID: -7547102972462405743}
-  - {fileID: 4594448988555719498}
-  - {fileID: 6332088161266160288}
+  - {fileID: -7919458928157497654}
+  - {fileID: -8128911792636562377}
+  - {fileID: 7225738764540848049}
+  - {fileID: 769042579215680501}
+  - {fileID: 3852423736043997497}
+  - {fileID: -60434473789610540}
   - {fileID: -6722977742578150530}
   - {fileID: 3056658522881897900}
   - {fileID: -701069488440192582}
@@ -1383,11 +1383,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0ebc320a151d3408ea1e9fce54d40e, type: 3}
   m_Name: OpenXRPackageSettings
   m_EditorClassIdentifier: 
-  Keys: 070000000100000004000000
+  Keys: 0700000001000000040000000d000000
   Values:
   - {fileID: -2470385514627339397}
   - {fileID: -6519342690796016187}
   - {fileID: -5848426042941322628}
+  - {fileID: 2724568456455984127}
 --- !u!114 &258198876306462678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1776,6 +1777,35 @@ MonoBehaviour:
   targetOpenXRApiVersion: 
   required: 0
   customRuntimeLoaderName: 
+--- !u!114 &2724568456455984127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5a1f07dc5afe854f9f12a4194aca3fb, type: 3}
+  m_Name: WebGL
+  m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.OpenXRSettings
+  features:
+  - {fileID: 7708366014453576543}
+  customLoaderName: 
+  m_renderMode: 1
+  m_latencyOptimization: 0
+  m_autoColorSubmissionMode: 1
+  m_colorSubmissionModes:
+    m_List: 00000000
+  m_depthSubmissionMode: 0
+  m_spacewarpMotionVectorTextureFormat: 0
+  m_optimizeBufferDiscards: 0
+  m_symmetricProjection: 0
+  m_optimizeMultiviewRenderRegions: 0
+  m_multiviewRenderRegionsOptimizationMode: 0
+  m_hasMigratedMultiviewRenderRegionSetting: 1
+  m_foveatedRenderingApi: 0
+  m_useOpenXRPredictedTime: 0
 --- !u!114 &3056658522881897900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2614,6 +2644,28 @@ MonoBehaviour:
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metaquestplus
   openxrExtensionStrings: XR_META_touch_controller_plus
+  company: Unity
+  priority: 0
+  targetOpenXRApiVersion: 
+  required: 0
+  customRuntimeLoaderName: 
+--- !u!114 &7708366014453576543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b213d3e3c7f3109449eb46a4c8ee42f0, type: 3}
+  m_Name: XrPerformanceSettingsFeature WebGL
+  m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.Features.Extensions.PerformanceSettings.XrPerformanceSettingsFeature
+  m_enabled: 0
+  nameUi: XR Performance Settings
+  version: 1.0.0
+  featureIdInternal: com.unity.openxr.feature.extension.performance_settings
+  openxrExtensionStrings: XR_EXT_performance_settings
   company: Unity
   priority: 0
   targetOpenXRApiVersion: 

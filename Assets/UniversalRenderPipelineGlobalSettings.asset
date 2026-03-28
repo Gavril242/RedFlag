@@ -68,7 +68,20 @@ MonoBehaviour:
       - rid: 3081062956036259842
       - rid: 3081062956036259843
     m_RuntimeSettings:
-      m_List: []
+      m_List:
+      - rid: 1902727375677030402
+      - rid: 1902727375677030408
+      - rid: 1902727375677030409
+      - rid: 1902727375677030411
+      - rid: 1902727375677030412
+      - rid: 1902727375677030414
+      - rid: 1902727375677030418
+      - rid: 1902727375677030423
+      - rid: 1902727375677030426
+      - rid: 1902727375677030427
+      - rid: 1902727375677030428
+      - rid: 3349439625158197249
+      - rid: 3081062956036259840
   m_AssetVersion: 10
   m_ObsoleteDefaultVolumeProfile: {fileID: 0}
   m_RenderingLayerNames:
@@ -520,7 +533,7 @@ MonoBehaviour:
           type: 3}
         _setAlphaChannelShader: {fileID: 7200000, guid: 5efaea0e81c66334aa9d062d6573e6fd,
           type: 3}
-        _pathTracingSkySamplingDataShader: {fileID: 7200000, guid: 5bb2534d2411d344cbc54f880232640f,
+        _environmentImportanceSamplingBuild: {fileID: 7200000, guid: 5bb2534d2411d344cbc54f880232640f,
           type: 3}
         _skyBoxMesh: {fileID: 4300000, guid: 0529e6c5f6dea8c4a8c2835ed7de57cb, type: 2}
         _sixFaceSkyBoxMesh: {fileID: 4300000, guid: a80925ceebd011741b42509226cefc74,

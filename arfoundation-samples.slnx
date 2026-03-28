@@ -1,0 +1,14 @@
+﻿<Solution>
+  <Project Path="Unity.XR.ARFoundation.Samples.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.SpatialKeyboard.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Unity.XR.Hands.Samples.VisualizerSample.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.StarterAssets.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.Hands.csproj" />
+  <Project Path="Unity.XR.ARFoundation.Samples.Editor.csproj" />
+  <Project Path="Unity.XR.ARFoundation.Samples.VisualScripting.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.SpatialKeyboard.Editor.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.StarterAssets.Editor.csproj" />
+  <Project Path="Unity.XR.Interaction.Toolkit.Samples.Hands.Editor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>
