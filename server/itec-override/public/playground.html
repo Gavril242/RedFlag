@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>iTEC OVERRIDE Playground</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  :root {
+    --bg: #07111c;
+    --panel: #101b2b;
+    --panel-2: #162338;
+    --border: #27415f;
+    --text: #dce7f6;
+    --muted: #8ea6c3;
+    --accent: #6ae3ff;
+    --accent-2: #ff8fab;
+    --ok: #98f5a5;
+    --warn: #ffd166;
+    --danger: #ff6b6b;
+    --a4-aspect-ratio: 1 / 1.414;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(106, 227, 255, 0.1), transparent 28%),
+      radial-gradient(circle at top right, rgba(255, 143, 171, 0.08), transparent 24%),
+      linear-gradient(180deg, #050b13 0%, #09111c 100%);
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8, 15, 26, 0.9);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .brand h1 {
+    margin: 0;
+    font-size: 1.45rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .brand p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .nav a,
+  button {
+    border: 0;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(180deg, #2b4263, #1c2c42);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .nav a.secondary,
+  button.secondary {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr) 360px;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .panel {
+    background: linear-gradient(180deg, rgba(19, 29, 46, 0.96), rgba(12, 20, 34, 0.96));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22);
+  }
+
+  .panel-title {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+
+  .panel-body {
+    padding: 16px;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .subsection {
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .subsection-title {
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  label {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--accent);
+  }
+
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--danger);
+  }
+
+  .dot.connected {
+    background: var(--ok);
+  }
+
+  .play-area {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  .meta-card {
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  }
+
+  .meta-label {
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .meta-note {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+
+  .mode-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .badge.active {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: transparent;
+    font-weight: 700;
+  }
+
+  .poster-stage-wrap {
+    padding: 16px;
+  }
+
+  .poster-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--a4-aspect-ratio);
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(7, 15, 24, 0.4), rgba(10, 16, 28, 0.5)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='400' viewBox='0 0 240 400'%3E%3Crect width='240' height='400' fill='%23131f32'/%3E%3Crect x='20' y='24' width='200' height='352' rx='28' fill='%231b2b44' stroke='%23314b6e'/%3E%3Cpath d='M48 112c24-30 50-46 78-46s53 15 77 44' stroke='%2325415e' stroke-width='18' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='86' cy='154' r='18' fill='%23253f5b'/%3E%3Ccircle cx='154' cy='186' r='24' fill='%23233a54'/%3E%3Cpath d='M62 284c18-24 42-36 74-36 28 0 55 10 82 31' stroke='%23314e73' stroke-width='14' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .poster-frame {
+    position: absolute;
+    inset: 6%;
+    border-radius: 18px;
+    background: rgba(245, 247, 251, 0.96);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  canvas,
+  #sticker-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  #draw-canvas {
+    touch-action: none;
+    cursor: crosshair;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 249, 255, 0.96)),
+      repeating-linear-gradient(
+        0deg,
+        rgba(18, 33, 56, 0.02),
+        rgba(18, 33, 56, 0.02) 18px,
+        transparent 18px,
+        transparent 36px
+      );
+  }
+
+  #sticker-layer {
+    pointer-events: none;
+  }
+
+  .sticker {
+    position: absolute;
+    transform-origin: center center;
+    object-fit: contain;
+    user-select: none;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+  }
+
+  .hint {
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .item {
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.82rem;
+  }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .sticker-choice {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 8px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .sticker-choice img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    display: block;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    margin-bottom: 8px;
+  }
+
+  .sticker-choice strong {
+    display: block;
+    font-size: 0.74rem;
+  }
+
+  .item strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  pre {
+    margin: 0;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    color: #d7f7ff;
+    overflow: auto;
+    font-size: 0.76rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .media-player-host {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.18);
+  }
+
+  .media-player-host iframe,
+  .media-player-host audio {
+    width: 100%;
+    display: block;
+    border: 0;
+  }
+
+  .media-player-host audio {
+    padding: 12px;
+  }
+
+  .small {
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 1280px) {
+    main {
+      grid-template-columns: 300px minmax(0, 1fr);
+    }
+
+    .right-column {
+      grid-column: 1 / -1;
+    }
+
+    .meta-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 860px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+
+    .meta-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>OVERRIDE Playground</h1>
+      <p>Browser client for trying poster rooms, strokes, stickers, territory, leaderboard, and REST endpoints.</p>
+    </div>
+    <div class="nav">
+      <a href="/">Command Center</a>
+      <a href="/playground.html" class="secondary">Playground</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-title">Session Controls</div>
+      <div class="panel-body stack">
+        <div class="status-pill">
+          <span class="dot" id="connection-dot"></span>
+          <span id="connection-text">Connecting...</span>
+        </div>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Auth</h3>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="auth-username">Username</label>
+              <input id="auth-username" value="Player1" />
+            </div>
+            <div class="field-group">
+              <label for="auth-password">Password</label>
+              <input id="auth-password" type="password" placeholder="Enter password" />
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="register-btn" class="secondary">Register</button>
+            <button id="login-btn" class="secondary">Login</button>
+            <button id="session-btn" class="secondary">Get Session</button>
+            <button id="logout-btn" class="secondary">Logout</button>
+          </div>
+          <div class="field-group">
+            <label for="active-username">Logged In As</label>
+            <input id="active-username" value="Not logged in" readonly />
+          </div>
+          <div class="field-group">
+            <label for="active-team-id">Current Team</label>
+            <input id="active-team-id" value="No team selected" readonly />
+          </div>
+          <div class="hint">
+            Register or login first. After that, your browser session becomes the source of truth for username and team.
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Teams</h3>
+          <div class="field-group">
+            <label for="team-select">Available Teams</label>
+            <select id="team-select">
+              <option value="">Load teams first</option>
+            </select>
+          </div>
+          <div class="button-row">
+            <button id="teams-btn" class="secondary">List Teams</button>
+            <button id="join-team-btn" class="secondary">Join Selected Team</button>
+          </div>
+          <div class="field-group">
+            <label for="create-team-name">Create Team Name</label>
+            <input id="create-team-name" placeholder="My Team" />
+          </div>
+          <div class="field-group">
+            <label for="create-team-anthem-title">Team Anthem Title</label>
+            <input id="create-team-anthem-title" placeholder="Battle Hymn" />
+          </div>
+          <div class="field-group">
+            <label for="create-team-anthem-url">Team Anthem URL</label>
+            <input id="create-team-anthem-url" placeholder="https://example.com/anthem.mp3" />
+          </div>
+          <div class="button-row">
+            <button id="create-team-btn" class="secondary">Create Team</button>
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Poster Session</h3>
+          <div class="field-group">
+            <label for="poster-id">Poster ID</label>
+            <input id="poster-id" value="POSTER_A" />
+          </div>
+          <div class="button-row">
+            <button id="join-btn">Join Poster</button>
+            <button id="reload-btn" class="secondary">Reload State</button>
+          </div>
+          <div class="hint">
+            Join poster is enabled only after you are logged in and on a team.
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Sync</h3>
+          <div class="field-group">
+            <label for="reload-interval">Auto Reload State (seconds, `0` disables)</label>
+            <input id="reload-interval" type="number" min="0" step="0.1" value="1" />
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Tools</h3>
+          <div class="button-row">
+            <button id="mode-draw-btn">Draw</button>
+            <button id="mode-sticker-btn" class="secondary">Place URL/GIF</button>
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="stroke-color">Stroke Color</label>
+              <input id="stroke-color" type="color" value="#ff2d55" />
+            </div>
+            <div class="field-group">
+              <label for="stroke-width">Stroke Width</label>
+              <input id="stroke-width" type="number" min="1" max="64" value="8" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="sticker-url">Sticker URL</label>
+            <input id="sticker-url" value="https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif" />
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="sticker-width">Sticker Width</label>
+              <input id="sticker-width" type="number" min="0.01" max="1" step="0.01" value="0.18" />
+            </div>
+            <div class="field-group">
+              <label for="sticker-height">Sticker Height</label>
+              <input id="sticker-height" type="number" min="0.01" max="1" step="0.01" value="0.18" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="sticker-rotation">Sticker Rotation</label>
+            <input id="sticker-rotation" type="number" step="1" value="0" />
+          </div>
+
+          <div class="field-group">
+            <label for="admin-key">Admin Key</label>
+            <input id="admin-key" placeholder="Needed for clear_canvas" />
+          </div>
+
+          <div class="button-row">
+            <button id="territory-btn" class="secondary">Get Territory</button>
+            <button id="leaderboard-btn" class="secondary">Get Leaderboard</button>
+            <button id="clear-btn" class="secondary">Clear Poster</button>
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Sticker Lab</h3>
+          <div class="button-row">
+            <button id="load-stickers-btn" class="secondary">Load Sticker Library</button>
+            <button id="use-library-sticker-btn" class="secondary">Use Library Sticker</button>
+          </div>
+          <div id="sticker-library" class="sticker-grid">
+            <div class="item">No sticker library loaded.</div>
+          </div>
+          <div class="field-group">
+            <label for="generate-sticker-prompt">Generate AI Sticker</label>
+            <input id="generate-sticker-prompt" placeholder="cyber cat sticker, flat graphic, transparent background look" />
+          </div>
+          <div class="button-row">
+            <button id="generate-sticker-btn" class="secondary">Generate Sticker</button>
+            <button id="use-generated-sticker-btn" class="secondary">Use Generated Sticker</button>
+          </div>
+          <div class="hint">
+            Local stickers always work. AI generation requires `HF_TOKEN` on the backend.
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Audio</h3>
+          <div class="field-group">
+            <label for="audio-title">Audio Title</label>
+            <input id="audio-title" value="Team Anthem" />
+          </div>
+          <div class="field-group">
+            <label for="audio-url">Audio URL</label>
+            <input id="audio-url" placeholder="https://example.com/anthem.mp3" />
+          </div>
+          <div class="button-row">
+            <button id="set-audio-btn" class="secondary">Attach Audio</button>
+            <button id="play-audio-btn" class="secondary">Simulate Rival Trigger</button>
+            <button id="clear-audio-btn" class="secondary">Clear Audio</button>
+          </div>
+        </section>
+
+        <section class="subsection stack">
+          <h3 class="subsection-title">Coordinates</h3>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="coord-origin">Input Origin</label>
+              <select id="coord-origin">
+                <option value="top-left">Top Left</option>
+                <option value="bottom-left">Bottom Left</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="coord-space">Input Space</label>
+              <select id="coord-space">
+                <option value="normalized">Normalized</option>
+                <option value="pixels">Pixels</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="coord-flip-x">Flip X</label>
+              <select id="coord-flip-x">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="coord-flip-y">Flip Y</label>
+              <select id="coord-flip-y">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <div class="hint">
+          Flow: register/login, create or join a team, join a poster, then draw or place stickers.<br />
+          Browser actions always use the logged-in session identity.
+        </div>
+      </div>
+    </section>
+
+    <section class="panel play-area">
+      <div class="toolbar">
+        <div>
+          <strong id="active-poster-label">Poster: not joined</strong>
+          <div class="small" id="active-team-label">Team: -</div>
+        </div>
+        <div class="mode-badges">
+          <div class="badge active" id="draw-badge">Draw Mode</div>
+          <div class="badge" id="sticker-badge">Sticker Mode</div>
+        </div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <div class="meta-label">Session</div>
+          <div class="meta-value" id="meta-user">Not logged in</div>
+          <div class="meta-note" id="meta-session-note">Browser actions are locked until login.</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Team</div>
+          <div class="meta-value" id="meta-team">No team</div>
+          <div class="meta-note" id="meta-team-note">Create or join a team first.</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Poster Owner</div>
+          <div class="meta-value" id="meta-owner">Unclaimed</div>
+          <div class="meta-note" id="meta-owner-note">No visible territory yet.</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Your Coverage</div>
+          <div class="meta-value" id="meta-coverage">0.0%</div>
+          <div class="meta-note" id="meta-coverage-note">Whole-poster visible area.</div>
+        </div>
+      </div>
+      <div class="poster-stage-wrap">
+        <div class="poster-stage" id="poster-stage">
+          <div class="poster-frame">
+            <canvas id="draw-canvas" width="1000" height="1414"></canvas>
+            <div id="sticker-layer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body stack">
+        <div class="field-group">
+          <label>Socket Event Log</label>
+          <div class="button-row">
+            <button id="clear-log-btn" class="secondary">Clear Event Log</button>
+          </div>
+          <pre id="event-log">Waiting for events...</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="right-column stack">
+      <section class="panel">
+        <div class="panel-title">Poster State</div>
+        <div class="panel-body stack">
+          <div class="field-group">
+            <label>Auth / Teams</label>
+            <pre id="auth-output">{}</pre>
+          </div>
+          <div class="field-group">
+            <label>Poster Audio</label>
+            <pre id="audio-output">{}</pre>
+            <div id="audio-player-host" class="media-player-host"></div>
+          </div>
+          <div class="field-group">
+            <label>Territory</label>
+            <pre id="territory-output">{}</pre>
+          </div>
+          <div class="field-group">
+            <label>REST Response</label>
+            <div class="button-row">
+              <button id="health-rest-btn" class="secondary">GET /api/health</button>
+              <button id="posters-rest-btn" class="secondary">GET /api/posters</button>
+              <button id="canvas-rest-btn" class="secondary">GET canvas</button>
+              <button id="territory-rest-btn" class="secondary">GET territory</button>
+              <button id="leaderboard-rest-btn" class="secondary">GET leaderboard</button>
+            </div>
+            <pre id="rest-output">{}</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Stickers</div>
+        <div class="panel-body">
+          <div class="list" id="sticker-list">
+            <div class="item">No stickers yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Recent Strokes</div>
+        <div class="panel-body">
+          <div class="list" id="stroke-list">
+            <div class="item">No strokes yet.</div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const socket = io({
+      transports: ["polling", "websocket"],
+      withCredentials: true,
+    });
+
+    const drawCanvas = document.getElementById("draw-canvas");
+    const drawContext = drawCanvas.getContext("2d");
+    const stickerLayer = document.getElementById("sticker-layer");
+    const eventLog = document.getElementById("event-log");
+    const authOutput = document.getElementById("auth-output");
+    const audioOutput = document.getElementById("audio-output");
+    const audioPlayerHost = document.getElementById("audio-player-host");
+    const territoryOutput = document.getElementById("territory-output");
+    const restOutput = document.getElementById("rest-output");
+    const strokeList = document.getElementById("stroke-list");
+    const stickerList = document.getElementById("sticker-list");
+    const teamSelect = document.getElementById("team-select");
+    const stickerLibrary = document.getElementById("sticker-library");
+    let currentPosterId = "";
+    let currentMode = "draw";
+    let strokes = [];
+    let stickers = [];
+    let territoryState = {};
+    let authState = { ok: false, teams: [] };
+    let posterAudio = null;
+    let availableStickerAssets = [];
+    let selectedLibraryStickerUrl = "";
+    let generatedStickerUrl = "";
+    let currentLayout = { width: 1000, height: 1414, aspectRatio: 1000 / 1414, origin: "top-left" };
+    let isDrawing = false;
+    let pendingPoints = [];
+    let reloadTimer = null;
+
+    function value(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function numberValue(id, fallback) {
+      const parsed = Number(document.getElementById(id).value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function currentUser() {
+      return authState.user || authState.currentUser || authState.player || authState.currentPlayer || null;
+    }
+
+    function currentTeam() {
+      return authState.team || authState.currentTeam || null;
+    }
+
+    function isLoggedIn() {
+      return Boolean(currentUser());
+    }
+
+    function hasTeam() {
+      return Boolean(currentTeam()?.id);
+    }
+
+    function canUsePosterTools() {
+      return isLoggedIn() && hasTeam() && Boolean(currentPosterId);
+    }
+
+    function coordinateMetaFromControls() {
+      return {
+        coordinateSpace: value("coord-space") || "normalized",
+        origin: value("coord-origin") || "top-left",
+        flipX: value("coord-flip-x") === "true",
+        flipY: value("coord-flip-y") === "true",
+      };
+    }
+
+    function applyLayout(layout) {
+      if (!layout || !Number.isFinite(layout.width) || !Number.isFinite(layout.height)) {
+        return;
+      }
+
+      currentLayout = {
+        width: layout.width,
+        height: layout.height,
+        aspectRatio: layout.aspectRatio || layout.width / layout.height,
+        origin: layout.origin || "top-left",
+      };
+
+      drawCanvas.width = currentLayout.width;
+      drawCanvas.height = currentLayout.height;
+    }
+
+    function logEvent(message, payload) {
+      const next = `[${new Date().toLocaleTimeString()}] ${message}` +
+        (payload === undefined ? "" : `\n${JSON.stringify(payload, null, 2)}`);
+      eventLog.textContent = `${next}\n\n${eventLog.textContent}`.trim().slice(0, 24000);
+    }
+
+    function autoReloadSeconds() {
+      return Math.max(0, numberValue("reload-interval", 1));
+    }
+
+    async function reloadPosterState(options = {}) {
+      const posterId = options.posterId || currentPosterId || value("poster-id");
+      if (!posterId) return null;
+
+      const [canvasState, territory] = await Promise.all([
+        callRest(`/api/posters/${encodeURIComponent(posterId)}/canvas`),
+        callRest(`/api/posters/${encodeURIComponent(posterId)}/territory`),
+      ]);
+
+      currentPosterId = posterId;
+      applyLayout(canvasState.layout);
+      posterAudio = canvasState.audio || null;
+      strokes = canvasState.strokes || [];
+      stickers = canvasState.stickers || [];
+      territoryState = territory || {};
+      syncUI();
+
+      if (!options.silent) {
+        logEvent("reload state", { posterId, stickerCount: stickers.length, strokeCount: strokes.length });
+      }
+
+      return { canvasState, territory };
+    }
+
+    function syncReloadTimer() {
+      if (reloadTimer) {
+        clearInterval(reloadTimer);
+        reloadTimer = null;
+      }
+
+      const seconds = autoReloadSeconds();
+      if (seconds <= 0 || !currentPosterId) return;
+
+      reloadTimer = setInterval(() => {
+        reloadPosterState({ silent: true }).catch((error) => {
+          logEvent("reload state failed", { message: error?.message || String(error) });
+        });
+      }, seconds * 1000);
+    }
+
+    function setConnection(connected) {
+      const dot = document.getElementById("connection-dot");
+      const text = document.getElementById("connection-text");
+      dot.classList.toggle("connected", connected);
+      text.textContent = connected ? "Connected" : "Disconnected";
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById("draw-badge").classList.toggle("active", mode === "draw");
+      document.getElementById("sticker-badge").classList.toggle("active", mode === "sticker");
+      document.getElementById("mode-draw-btn").classList.toggle("secondary", mode !== "draw");
+      document.getElementById("mode-sticker-btn").classList.toggle("secondary", mode !== "sticker");
+      drawCanvas.style.cursor = mode === "draw" ? "crosshair" : "copy";
+    }
+
+    function renderTerritory() {
+      territoryOutput.textContent = JSON.stringify(territoryState, null, 2);
+    }
+
+    function renderAuth() {
+      authOutput.textContent = JSON.stringify(authState, null, 2);
+    }
+
+    function renderAudio() {
+      audioOutput.textContent = JSON.stringify(posterAudio, null, 2);
+      renderPosterAudioPlayer(posterAudio?.url || "");
+    }
+
+    function buildEmbeddedMedia(url) {
+      if (!url) return null;
+
+      try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+
+        if (host === "youtu.be") {
+          const videoId = parsed.pathname.split("/").filter(Boolean)[0];
+          if (videoId) {
+            return {
+              kind: "youtube",
+              src: `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`,
+              height: 220,
+            };
+          }
+        }
+
+        if (host === "youtube.com" || host === "music.youtube.com") {
+          const videoId = parsed.searchParams.get("v");
+          if (videoId) {
+            return {
+              kind: "youtube",
+              src: `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`,
+              height: 220,
+            };
+          }
+        }
+
+      } catch (_error) {
+        return null;
+      }
+
+      return null;
+    }
+
+    function renderPosterAudioPlayer(url) {
+      audioPlayerHost.replaceChildren();
+      if (!url) return;
+
+      const embedded = buildEmbeddedMedia(url);
+      if (embedded) {
+        const iframe = document.createElement("iframe");
+        iframe.src = embedded.src;
+        iframe.loading = "lazy";
+        iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture";
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+        iframe.height = String(embedded.height);
+        audioPlayerHost.appendChild(iframe);
+        return;
+      }
+
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.autoplay = true;
+      audio.src = url;
+      audioPlayerHost.appendChild(audio);
+    }
+
+    function renderStickerLibrary() {
+      if (!availableStickerAssets.length) {
+        stickerLibrary.innerHTML = '<div class="item">No sticker library loaded.</div>';
+        return;
+      }
+
+      stickerLibrary.innerHTML = availableStickerAssets.map((sticker) => `
+        <button class="sticker-choice" data-sticker-url="${sticker.url}">
+          <img src="${sticker.url}" alt="${sticker.name}" />
+          <strong>${sticker.name}</strong>
+        </button>
+      `).join("");
+    }
+
+    function renderTeamOptions(teams = []) {
+      if (!teams.length) {
+        teamSelect.innerHTML = '<option value="">No teams loaded</option>';
+        return;
+      }
+
+      const activeTeamId = currentTeam()?.id || "";
+      teamSelect.innerHTML = teams.map((team) => `
+        <option value="${team.id}" ${team.id === activeTeamId ? "selected" : ""}>
+          ${team.name} (${team.memberCount} members)
+        </option>
+      `).join("");
+    }
+
+    function renderStrokeList() {
+      if (!strokes.length) {
+        strokeList.innerHTML = '<div class="item">No strokes yet.</div>';
+        return;
+      }
+
+      strokeList.innerHTML = strokes.slice(-8).reverse().map((stroke) => `
+        <div class="item">
+          <strong>${stroke.teamId || "unknown"} · ${stroke.id}</strong>
+          color ${stroke.color} · width ${stroke.width} · ${stroke.points.length} points
+        </div>
+      `).join("");
+    }
+
+    function renderStickerList() {
+      if (!stickers.length) {
+        stickerList.innerHTML = '<div class="item">No stickers yet.</div>';
+        return;
+      }
+
+      stickerList.innerHTML = stickers.slice().reverse().map((sticker) => `
+        <div class="item">
+          <strong>${sticker.id}</strong>
+          ${sticker.url}<br />
+          team ${sticker.teamId || "unknown"} · x ${sticker.x.toFixed(2)} · y ${sticker.y.toFixed(2)}<br />
+          <div style="margin-top:8px;">
+            <button class="secondary" data-remove-sticker="${sticker.id}">Remove</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderCanvas() {
+      drawContext.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      drawContext.lineCap = "round";
+      drawContext.lineJoin = "round";
+
+      for (const stroke of strokes) {
+        if (!stroke.points || stroke.points.length < 1) continue;
+
+        drawContext.strokeStyle = stroke.color || "#111";
+        drawContext.lineWidth = stroke.width || 4;
+        drawContext.beginPath();
+
+        stroke.points.forEach((point, index) => {
+          const x = point.x * drawCanvas.width;
+          const y = point.y * drawCanvas.height;
+          if (index === 0) {
+            drawContext.moveTo(x, y);
+          } else {
+            drawContext.lineTo(x, y);
+          }
+        });
+
+        if (stroke.points.length === 1) {
+          const point = stroke.points[0];
+          drawContext.arc(
+            point.x * drawCanvas.width,
+            point.y * drawCanvas.height,
+            Math.max(1, (stroke.width || 4) / 2),
+            0,
+            Math.PI * 2
+          );
+          drawContext.fillStyle = stroke.color || "#111";
+          drawContext.fill();
+        } else {
+          drawContext.stroke();
+        }
+      }
+
+      stickerLayer.replaceChildren();
+
+      for (const sticker of stickers) {
+        const image = document.createElement("img");
+        image.className = "sticker";
+        image.src = sticker.url;
+        image.alt = sticker.id;
+        image.referrerPolicy = "no-referrer";
+        image.style.width = `${sticker.width * 100}%`;
+        image.style.height = `${sticker.height * 100}%`;
+        image.style.left = `${sticker.x * 100}%`;
+        image.style.top = `${sticker.y * 100}%`;
+        image.style.transform = `translate(-50%, -50%) rotate(${sticker.rotation || 0}deg)`;
+        image.addEventListener("error", () => {
+          logEvent("sticker image failed", { stickerId: sticker.id, url: sticker.url });
+        });
+        stickerLayer.appendChild(image);
+      }
+    }
+
+    function upsertStroke(stroke) {
+      if (!stroke || !stroke.id) return;
+      const existingIndex = strokes.findIndex((item) => item.id === stroke.id);
+      if (existingIndex >= 0) {
+        strokes[existingIndex] = stroke;
+      } else {
+        strokes.push(stroke);
+      }
+    }
+
+    function upsertSticker(sticker) {
+      if (!sticker || !sticker.id) return;
+      const existingIndex = stickers.findIndex((item) => item.id === sticker.id);
+      if (existingIndex >= 0) {
+        stickers[existingIndex] = sticker;
+      } else {
+        stickers.push(sticker);
+      }
+    }
+
+    function syncUI() {
+      const user = currentUser();
+      const team = currentTeam();
+      const loggedIn = isLoggedIn();
+      const teamChosen = hasTeam();
+      const posterReady = canUsePosterTools();
+
+      renderCanvas();
+      renderAuth();
+      renderAudio();
+      renderStrokeList();
+      renderStickerList();
+      renderTerritory();
+      renderTeamOptions(authState.teams || []);
+      document.getElementById("active-poster-label").textContent = currentPosterId
+        ? `Poster: ${currentPosterId}`
+        : "Poster: not joined";
+      document.getElementById("active-team-label").textContent =
+        `Team: ${team?.name || team?.id || "-"}`;
+      document.getElementById("meta-user").textContent = user?.username || "Not logged in";
+      document.getElementById("meta-session-note").textContent = loggedIn
+        ? "Session identity is locked to this browser."
+        : "Browser actions are locked until login.";
+      document.getElementById("meta-team").textContent = team?.name || "No team";
+      document.getElementById("meta-team-note").textContent = team?.id
+        ? `Team ID: ${team.id}`
+        : "Create or join a team first.";
+      document.getElementById("meta-owner").textContent = territoryState?.owner || "Unclaimed";
+      document.getElementById("meta-owner-note").textContent = currentPosterId
+        ? "Based on final visible content."
+        : "Join a poster to see territory.";
+      document.getElementById("meta-coverage").textContent = team?.id
+        ? `${Number(territoryState?.rawArea?.[team.id] || 0).toFixed(1)}%`
+        : "0.0%";
+      document.getElementById("meta-coverage-note").textContent = team?.id
+        ? "Whole-poster visible area."
+        : "Whole-poster visible area.";
+      document.getElementById("active-username").value = user?.username || "Not logged in";
+      document.getElementById("active-team-id").value = team?.name
+        ? `${team.name} (${team.id})`
+        : "No team selected";
+
+      document.getElementById("auth-username").disabled = loggedIn;
+      document.getElementById("auth-password").disabled = loggedIn;
+      document.getElementById("register-btn").disabled = loggedIn;
+      document.getElementById("login-btn").disabled = loggedIn;
+      document.getElementById("logout-btn").disabled = !loggedIn;
+
+      document.getElementById("teams-btn").disabled = !loggedIn;
+      document.getElementById("team-select").disabled = !loggedIn;
+      document.getElementById("join-team-btn").disabled = !loggedIn || !teamSelect.value;
+      document.getElementById("create-team-name").disabled = !loggedIn;
+      document.getElementById("create-team-anthem-title").disabled = !loggedIn;
+      document.getElementById("create-team-anthem-url").disabled = !loggedIn;
+      document.getElementById("create-team-btn").disabled = !loggedIn;
+
+      document.getElementById("join-btn").disabled = !teamChosen;
+      document.getElementById("reload-btn").disabled = !value("poster-id");
+      document.getElementById("mode-draw-btn").disabled = !posterReady;
+      document.getElementById("mode-sticker-btn").disabled = !posterReady;
+      document.getElementById("territory-btn").disabled = !currentPosterId;
+      document.getElementById("clear-btn").disabled = !currentPosterId;
+      document.getElementById("set-audio-btn").disabled = !posterReady;
+      document.getElementById("play-audio-btn").disabled = !posterReady;
+      document.getElementById("clear-audio-btn").disabled = !posterReady;
+      document.getElementById("load-stickers-btn").disabled = false;
+      document.getElementById("generate-sticker-btn").disabled = !loggedIn;
+      document.getElementById("use-library-sticker-btn").disabled = !selectedLibraryStickerUrl;
+      document.getElementById("use-generated-sticker-btn").disabled = !generatedStickerUrl;
+      drawCanvas.style.pointerEvents = posterReady ? "auto" : "none";
+    }
+
+    function normalisedPointFromEvent(event) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      return {
+        x: Math.max(0, Math.min(1, x)),
+        y: Math.max(0, Math.min(1, y)),
+      };
+    }
+
+    async function callRest(path, options = {}) {
+      const response = await fetch(path, {
+        credentials: "same-origin",
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        },
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const body = contentType.includes("application/json")
+        ? await response.json()
+        : await response.text();
+      restOutput.textContent = JSON.stringify(body, null, 2);
+      if (!response.ok) {
+        throw new Error(body?.error || `HTTP ${response.status}`);
+      }
+      return body;
+    }
+
+    async function refreshSession() {
+      try {
+        const body = await callRest("/api/auth/session");
+        authState = { ...authState, ...body };
+      } catch (_error) {
+        authState = { ok: false, teams: authState.teams || [] };
+      }
+      syncUI();
+      return authState;
+    }
+
+    async function refreshTeams() {
+      const body = await callRest("/api/teams");
+      authState = {
+        ...authState,
+        ...body,
+        user: body.currentUser || authState.user || null,
+        player: body.currentPlayer || authState.player || null,
+        team: body.currentTeam || authState.team || null,
+        teams: body.teams || [],
+      };
+      syncUI();
+      return body;
+    }
+
+    async function loadStickerLibrary() {
+      const body = await callRest("/api/stickers/library");
+      availableStickerAssets = body.stickers || [];
+      selectedLibraryStickerUrl = availableStickerAssets[0]?.url || "";
+      renderStickerLibrary();
+      syncUI();
+      return body;
+    }
+
+    function useStickerUrl(url, sourceLabel) {
+      if (!url) return;
+      document.getElementById("sticker-url").value = url;
+      setMode("sticker");
+      logEvent(`${sourceLabel} ready`, { url });
+      syncUI();
+    }
+
+    function joinPoster() {
+      if (!hasTeam()) {
+        logEvent("join_poster blocked", { error: "log in and join a team first" });
+        return;
+      }
+
+      const posterId = value("poster-id");
+      if (!posterId) return;
+
+      currentPosterId = posterId;
+      const payload = {
+        posterId,
+        teamId: currentTeam()?.id || "unknown",
+        username: currentUser()?.username || "guest",
+        coordinateMeta: coordinateMetaFromControls(),
+      };
+      socket.emit("join_poster", payload);
+
+      logEvent("emit join_poster", payload);
+      syncReloadTimer();
+      syncUI();
+    }
+
+    function refreshSocketIdentity() {
+      if (socket.connected) {
+        socket.disconnect();
+      }
+      socket.connect();
+    }
+
+    socket.on("connect", () => {
+      setConnection(true);
+      logEvent("socket connected");
+      if (currentPosterId && hasTeam()) {
+        joinPoster();
+      } else {
+        syncReloadTimer();
+      }
+    });
+
+    socket.on("disconnect", () => {
+      setConnection(false);
+      logEvent("socket disconnected");
+    });
+
+    socket.on("canvas_state", (payload) => {
+      currentPosterId = payload.posterId;
+      applyLayout(payload.layout);
+      posterAudio = payload.audio || null;
+      strokes = payload.strokes || [];
+      stickers = payload.stickers || [];
+      territoryState = payload.territory || {};
+      logEvent("recv canvas_state", payload);
+      syncReloadTimer();
+      syncUI();
+    });
+
+    socket.on("stroke_added", ({ posterId, stroke }) => {
+      if (posterId && currentPosterId && posterId !== currentPosterId) return;
+      upsertStroke(stroke);
+      logEvent("recv stroke_added", stroke);
+      syncUI();
+    });
+
+    socket.on("sticker_added", ({ posterId, sticker }) => {
+      if (posterId && currentPosterId && posterId !== currentPosterId) return;
+      upsertSticker(sticker);
+      logEvent("recv sticker_added", sticker);
+      syncUI();
+    });
+
+    socket.on("sticker_removed", ({ stickerId }) => {
+      stickers = stickers.filter((sticker) => sticker.id !== stickerId);
+      logEvent("recv sticker_removed", { stickerId });
+      syncUI();
+    });
+
+    socket.on("canvas_cleared", ({ posterId }) => {
+      if (posterId === currentPosterId) {
+        strokes = [];
+        stickers = [];
+        posterAudio = null;
+        territoryState = { posterId, owner: null, teams: {}, rawArea: {} };
+      }
+      logEvent("recv canvas_cleared", { posterId });
+      syncUI();
+    });
+
+    socket.on("territory_update", ({ territory }) => {
+      territoryState = territory || {};
+      logEvent("recv territory_update", territory);
+      syncUI();
+    });
+
+    socket.on("territory_state", ({ territory }) => {
+      territoryState = territory || {};
+      logEvent("recv territory_state", territory);
+      syncUI();
+    });
+
+    socket.on("leaderboard_state", (payload) => {
+      logEvent("recv leaderboard_state", payload);
+      restOutput.textContent = JSON.stringify(payload, null, 2);
+    });
+
+    socket.on("poster_audio_updated", ({ posterId, audio }) => {
+      if (posterId && currentPosterId && posterId !== currentPosterId) return;
+      posterAudio = audio || null;
+      logEvent("recv poster_audio_updated", { posterId, audio });
+      syncUI();
+    });
+
+    socket.on("poster_audio_cleared", ({ posterId }) => {
+      if (posterId && currentPosterId && posterId !== currentPosterId) return;
+      posterAudio = null;
+      logEvent("recv poster_audio_cleared", { posterId });
+      syncUI();
+    });
+
+    socket.on("poster_audio_trigger", ({ posterId, audio }) => {
+      if (posterId && currentPosterId && posterId !== currentPosterId) return;
+      posterAudio = audio || null;
+      logEvent("recv poster_audio_trigger", { posterId, audio });
+      if (audio?.url) {
+        playPosterAudio(audio.url);
+      }
+      syncUI();
+    });
+
+    function playPosterAudio(url) {
+      if (!url) return;
+      const embedded = buildEmbeddedMedia(url);
+      if (embedded) {
+        renderPosterAudioPlayer(url);
+        return;
+      }
+
+      const player = new Audio(url);
+      player.play().catch((error) => {
+        logEvent("audio playback failed", { message: error?.message || String(error), url });
+      });
+    }
+
+    drawCanvas.addEventListener("pointerdown", (event) => {
+      if (!canUsePosterTools()) return;
+      drawCanvas.setPointerCapture?.(event.pointerId);
+
+      if (currentMode === "sticker") {
+        const point = normalisedPointFromEvent(event);
+        const payload = {
+          posterId: currentPosterId,
+          url: value("sticker-url"),
+          x: point.x,
+          y: point.y,
+          width: numberValue("sticker-width", 0.18),
+          height: numberValue("sticker-height", 0.18),
+          rotation: numberValue("sticker-rotation", 0),
+          coordinateMeta: coordinateMetaFromControls(),
+        };
+
+        socket.emit("place_sticker", payload, (response) => {
+          if (response?.ok && response.sticker) {
+            upsertSticker(response.sticker);
+            syncUI();
+          }
+          logEvent("ack place_sticker", response);
+        });
+        logEvent("emit place_sticker", payload);
+        return;
+      }
+
+      isDrawing = true;
+      pendingPoints = [normalisedPointFromEvent(event)];
+    });
+
+    drawCanvas.addEventListener("pointermove", (event) => {
+      if (!isDrawing || currentMode !== "draw") return;
+
+      pendingPoints.push(normalisedPointFromEvent(event));
+      renderCanvas();
+
+      const previewStroke = {
+        color: document.getElementById("stroke-color").value,
+        width: numberValue("stroke-width", 8),
+        points: pendingPoints,
+      };
+
+      drawContext.strokeStyle = previewStroke.color;
+      drawContext.lineWidth = previewStroke.width;
+      drawContext.lineCap = "round";
+      drawContext.lineJoin = "round";
+      drawContext.beginPath();
+      previewStroke.points.forEach((point, index) => {
+        const x = point.x * drawCanvas.width;
+        const y = point.y * drawCanvas.height;
+        if (index === 0) drawContext.moveTo(x, y);
+        else drawContext.lineTo(x, y);
+      });
+      drawContext.stroke();
+    });
+
+    function finishStroke() {
+      if (!isDrawing || currentMode !== "draw") return;
+      isDrawing = false;
+
+      if (!pendingPoints.length || !canUsePosterTools()) return;
+
+      const payload = {
+        posterId: currentPosterId,
+        color: document.getElementById("stroke-color").value,
+        width: numberValue("stroke-width", 8),
+        points: pendingPoints,
+        coordinateMeta: coordinateMetaFromControls(),
+      };
+
+      socket.emit("draw_stroke", payload, (response) => {
+        if (response?.ok && response.stroke) {
+          upsertStroke(response.stroke);
+          syncUI();
+        }
+        logEvent("ack draw_stroke", response);
+      });
+      logEvent("emit draw_stroke", payload);
+      pendingPoints = [];
+    }
+
+    drawCanvas.addEventListener("pointerup", finishStroke);
+    drawCanvas.addEventListener("pointerleave", finishStroke);
+    drawCanvas.addEventListener("pointercancel", finishStroke);
+
+    document.getElementById("join-btn").addEventListener("click", joinPoster);
+    document.getElementById("register-btn").addEventListener("click", async () => {
+      try {
+        await callRest("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            username: value("auth-username"),
+            password: value("auth-password"),
+          }),
+        });
+        await refreshSession();
+        await refreshTeams();
+        refreshSocketIdentity();
+      } catch (error) {
+        logEvent("register failed", { message: error?.message || String(error) });
+        syncUI();
+      }
+    });
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      try {
+        await callRest("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            username: value("auth-username"),
+            password: value("auth-password"),
+          }),
+        });
+        await refreshSession();
+        await refreshTeams();
+        refreshSocketIdentity();
+      } catch (error) {
+        logEvent("login failed", { message: error?.message || String(error) });
+        syncUI();
+      }
+    });
+    document.getElementById("session-btn").addEventListener("click", () => {
+      refreshSession().catch((error) => {
+        logEvent("session fetch failed", { message: error?.message || String(error) });
+      });
+    });
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      try {
+        await callRest("/api/auth/logout", { method: "POST" });
+      } catch (error) {
+        logEvent("logout failed", { message: error?.message || String(error) });
+      }
+      authState = { ok: false, teams: [] };
+      currentPosterId = "";
+      strokes = [];
+      stickers = [];
+      posterAudio = null;
+      territoryState = {};
+      syncReloadTimer();
+      refreshSocketIdentity();
+      syncUI();
+    });
+    document.getElementById("teams-btn").addEventListener("click", () => {
+      refreshTeams().catch((error) => {
+        logEvent("teams fetch failed", { message: error?.message || String(error) });
+      });
+    });
+    document.getElementById("team-select").addEventListener("change", syncUI);
+    document.getElementById("load-stickers-btn").addEventListener("click", () => {
+      loadStickerLibrary().catch((error) => {
+        logEvent("load sticker library failed", { message: error?.message || String(error) });
+      });
+    });
+    document.getElementById("use-library-sticker-btn").addEventListener("click", () => {
+      useStickerUrl(selectedLibraryStickerUrl, "library sticker");
+    });
+    document.getElementById("create-team-btn").addEventListener("click", async () => {
+      try {
+        const body = await callRest("/api/teams", {
+          method: "POST",
+          body: JSON.stringify({
+            name: value("create-team-name"),
+            anthemTitle: value("create-team-anthem-title"),
+            anthemUrl: value("create-team-anthem-url"),
+          }),
+        });
+        authState = { ...authState, ...body };
+        refreshSocketIdentity();
+        syncUI();
+      } catch (error) {
+        logEvent("create team failed", { message: error?.message || String(error) });
+      }
+    });
+    document.getElementById("join-team-btn").addEventListener("click", async () => {
+      const teamId = teamSelect.value;
+      if (!teamId) return;
+      try {
+        const body = await callRest(`/api/teams/${encodeURIComponent(teamId)}/join`, {
+          method: "POST",
+        });
+        authState = { ...authState, ...body };
+        refreshSocketIdentity();
+        syncUI();
+      } catch (error) {
+        logEvent("join team failed", { message: error?.message || String(error) });
+      }
+    });
+    document.getElementById("reload-btn").addEventListener("click", () => {
+      reloadPosterState().catch((error) => {
+        logEvent("reload state failed", { message: error?.message || String(error) });
+      });
+    });
+    document.getElementById("reload-interval").addEventListener("input", syncReloadTimer);
+
+    document.getElementById("territory-btn").addEventListener("click", () => {
+      if (!currentPosterId) return;
+      socket.emit("get_territory", { posterId: currentPosterId }, (response) => {
+        logEvent("ack get_territory", response);
+      });
+      logEvent("emit get_territory", { posterId: currentPosterId });
+    });
+
+    document.getElementById("leaderboard-btn").addEventListener("click", () => {
+      socket.emit("get_leaderboard", {}, (response) => {
+        logEvent("ack get_leaderboard", response);
+      });
+      logEvent("emit get_leaderboard", {});
+    });
+
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      if (!currentPosterId) return;
+      const payload = {
+        posterId: currentPosterId,
+        adminKey: value("admin-key"),
+      };
+      socket.emit("clear_canvas", payload, (response) => {
+        logEvent("ack clear_canvas", response);
+      });
+      logEvent("emit clear_canvas", payload);
+    });
+
+    document.getElementById("set-audio-btn").addEventListener("click", async () => {
+      const posterId = currentPosterId || value("poster-id");
+      if (!posterId || !canUsePosterTools()) return;
+      try {
+        const body = await callRest(`/api/posters/${encodeURIComponent(posterId)}/audio`, {
+          method: "POST",
+          body: JSON.stringify({
+            title: value("audio-title") || "Poster Audio",
+            url: value("audio-url"),
+          }),
+        });
+        posterAudio = body.audio || null;
+        syncUI();
+      } catch (error) {
+        logEvent("attach audio failed", { message: error?.message || String(error) });
+      }
+    });
+
+    document.getElementById("play-audio-btn").addEventListener("click", async () => {
+      const posterId = currentPosterId || value("poster-id");
+      if (!posterId || !canUsePosterTools()) return;
+      try {
+        const body = await callRest(`/api/posters/${encodeURIComponent(posterId)}/audio/trigger`, {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+        if (body?.shouldPlay && body.audio?.url) {
+          posterAudio = body.audio;
+          playPosterAudio(body.audio.url);
+          syncUI();
+        }
+      } catch (error) {
+        logEvent("simulate audio failed", { message: error?.message || String(error) });
+      }
+    });
+
+    document.getElementById("clear-audio-btn").addEventListener("click", async () => {
+      const posterId = currentPosterId || value("poster-id");
+      if (!posterId || !canUsePosterTools()) return;
+      try {
+        const body = await callRest(`/api/posters/${encodeURIComponent(posterId)}/audio`, {
+          method: "DELETE",
+        });
+        if (body?.ok) {
+          posterAudio = null;
+          syncUI();
+        }
+      } catch (error) {
+        logEvent("clear audio failed", { message: error?.message || String(error) });
+      }
+    });
+
+    document.getElementById("generate-sticker-btn").addEventListener("click", async () => {
+      try {
+        const body = await callRest("/api/stickers/generate", {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: value("generate-sticker-prompt"),
+          }),
+        });
+        if (body?.sticker?.url) {
+          generatedStickerUrl = body.sticker.url;
+          document.getElementById("sticker-url").value = body.sticker.url;
+          availableStickerAssets = [body.sticker, ...availableStickerAssets];
+          renderStickerLibrary();
+          syncUI();
+          logEvent("generated sticker ready", body.sticker);
+        }
+      } catch (error) {
+        logEvent("generate sticker failed", { message: error?.message || String(error) });
+      }
+    });
+    document.getElementById("use-generated-sticker-btn").addEventListener("click", () => {
+      useStickerUrl(generatedStickerUrl, "generated sticker");
+    });
+
+    document.getElementById("mode-draw-btn").addEventListener("click", () => setMode("draw"));
+    document.getElementById("mode-sticker-btn").addEventListener("click", () => setMode("sticker"));
+    document.getElementById("clear-log-btn").addEventListener("click", () => {
+      eventLog.textContent = "Event log cleared.";
+    });
+
+    document.getElementById("health-rest-btn").addEventListener("click", () => callRest("/api/health"));
+    document.getElementById("posters-rest-btn").addEventListener("click", () => callRest("/api/posters"));
+    document.getElementById("canvas-rest-btn").addEventListener("click", () => {
+      if (!value("poster-id")) return;
+      callRest(`/api/posters/${encodeURIComponent(value("poster-id"))}/canvas`);
+    });
+    document.getElementById("territory-rest-btn").addEventListener("click", () => {
+      if (!value("poster-id")) return;
+      callRest(`/api/posters/${encodeURIComponent(value("poster-id"))}/territory`);
+    });
+    document.getElementById("leaderboard-rest-btn").addEventListener("click", () => callRest("/api/leaderboard"));
+
+    stickerList.addEventListener("click", (event) => {
+      const stickerId = event.target.getAttribute("data-remove-sticker");
+      if (!stickerId || !currentPosterId) return;
+
+      const payload = { posterId: currentPosterId, stickerId };
+      socket.emit("remove_sticker", payload, (response) => {
+        logEvent("ack remove_sticker", response);
+      });
+      logEvent("emit remove_sticker", payload);
+    });
+
+    stickerLibrary.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-sticker-url]");
+      if (!button) return;
+      selectedLibraryStickerUrl = button.getAttribute("data-sticker-url") || "";
+      document.getElementById("sticker-url").value = selectedLibraryStickerUrl;
+      logEvent("selected sticker asset", { url: selectedLibraryStickerUrl });
+      syncUI();
+    });
+
+    setMode("draw");
+    renderStickerLibrary();
+    loadStickerLibrary().catch(() => {});
+    refreshSession()
+      .then(() => refreshTeams().catch(() => {}))
+      .catch(() => {
+        authOutput.textContent = "Not logged in";
+        renderTeamOptions([]);
+      });
+    syncUI();
+    callRest("/api/health").catch(() => {
+      restOutput.textContent = "Could not reach /api/health";
+    });
+  </script>
+</body>
+</html>

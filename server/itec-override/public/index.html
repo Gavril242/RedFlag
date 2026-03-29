@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>iTEC OVERRIDE Command Center</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  :root {
+    --bg: #05080f;
+    --panel: #0c1220;
+    --panel-2: #10192d;
+    --border: #213252;
+    --text: #d8e3f4;
+    --muted: #7f93b2;
+    --accent: #00d9ff;
+    --danger: #ff4d6d;
+    --warn: #ffd166;
+    --ok: #7ae582;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background:
+      radial-gradient(circle at top, rgba(0, 217, 255, 0.08), transparent 30%),
+      linear-gradient(180deg, #060b14 0%, #03060b 100%);
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(255, 255, 255, 0.015) 3px,
+      rgba(255, 255, 255, 0.015) 4px
+    );
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10, 16, 28, 0.92);
+    backdrop-filter: blur(10px);
+  }
+
+  .title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .title span {
+    color: var(--danger);
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .stat {
+    min-width: 90px;
+    text-align: right;
+  }
+
+  .stat-label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .stat-value {
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .header-link {
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .connection-dot {
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--danger);
+    box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.45);
+    animation: pulse 1.2s infinite;
+  }
+
+  .connection-dot.connected {
+    background: var(--ok);
+    box-shadow: 0 0 0 0 rgba(122, 229, 130, 0.45);
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    min-height: calc(100vh - 89px);
+  }
+
+  .main-column {
+    display: grid;
+    grid-template-rows: 420px minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  #map-panel {
+    margin: 24px 24px 0;
+    overflow: hidden;
+  }
+
+  #poster-map {
+    height: calc(100% - 48px);
+    min-height: 320px;
+  }
+
+  #poster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 24px;
+    align-content: start;
+  }
+
+  .poster-card,
+  .panel {
+    background: linear-gradient(180deg, rgba(16, 25, 45, 0.96), rgba(8, 14, 26, 0.96));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  }
+
+  .poster-card {
+    padding: 16px;
+    position: relative;
+  }
+
+  .poster-id {
+    margin-bottom: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .owner-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    font-size: 0.72rem;
+  }
+
+  .owner-badge.contested { color: var(--warn); }
+  .owner-badge.owned { color: var(--ok); }
+  .owner-badge.empty { color: var(--muted); }
+
+  .territory-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0 10px;
+  }
+
+  .team-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 42px;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+
+  .team-name {
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-track {
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    transition: width 0.35s ease;
+  }
+
+  .bar-pct {
+    text-align: right;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    background: rgba(12, 18, 32, 0.75);
+  }
+
+  aside {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    border-left: 1px solid var(--border);
+    background: rgba(4, 8, 14, 0.75);
+  }
+
+  .panel {
+    margin: 16px;
+    overflow: hidden;
+  }
+
+  .panel-title {
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .map-popup-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .map-popup-sub {
+    color: #51647f;
+    font-size: 0.78rem;
+    margin-bottom: 8px;
+  }
+
+  #leaderboard,
+  #event-log,
+  .admin-content {
+    padding: 12px 16px 16px;
+  }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.84rem;
+  }
+
+  .lb-row:last-child,
+  .log-entry:last-child {
+    border-bottom: 0;
+  }
+
+  .lb-rank {
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .lb-team-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+  }
+
+  .lb-score {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  #event-log {
+    max-height: 360px;
+    overflow: auto;
+  }
+
+  .log-entry {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .ts {
+    margin-right: 8px;
+    color: rgba(0, 217, 255, 0.6);
+  }
+
+  .ev-join { color: var(--ok); }
+  .ev-take { color: var(--warn); }
+  .ev-clear { color: var(--danger); }
+  .ev-stroke { color: var(--text); }
+
+  .admin-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .admin-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--danger);
+  }
+
+  button {
+    padding: 10px 14px;
+    color: white;
+    background: linear-gradient(180deg, #ff6a85, #ff4d6d);
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  button:hover {
+    filter: brightness(1.05);
+  }
+
+  @media (max-width: 900px) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .status-bar {
+      justify-content: flex-start;
+    }
+
+    main {
+      grid-template-columns: 1fr;
+    }
+
+    .main-column {
+      grid-template-rows: 360px minmax(0, 1fr);
+    }
+
+    aside {
+      border-left: 0;
+      border-top: 1px solid var(--border);
+    }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="title">iTEC <span>OVERRIDE</span> Command Center</div>
+    <div class="header-actions">
+      <a class="header-link" href="/playground.html">Open Playground</a>
+      <div class="status-bar">
+        <div class="stat">
+          <span class="stat-label">Status</span>
+          <span class="stat-value">
+            <span class="connection-dot" id="conn-dot"></span><span id="conn-text">Connecting</span>
+          </span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Clients</span>
+          <span class="stat-value" id="client-count">-</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Posters</span>
+          <span class="stat-value" id="poster-count">-</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="main-column">
+      <section class="panel" id="map-panel">
+        <div class="panel-title">Live Poster Map</div>
+        <div id="poster-map"></div>
+      </section>
+
+      <section id="poster-grid">
+        <div class="empty-state" id="empty-msg">Waiting for poster activity.</div>
+      </section>
+    </section>
+
+    <aside>
+      <section class="panel">
+        <div class="panel-title">Leaderboard</div>
+        <div id="leaderboard">
+          <div style="color: var(--muted);">No data yet.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Server Health</div>
+        <div class="admin-content" id="health-info">Checking...</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Event Log</div>
+        <div id="event-log"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Admin: Clear Poster</div>
+        <div class="admin-content">
+          <div class="admin-row">
+            <input type="text" id="clear-poster-id" placeholder="Poster ID" />
+            <button id="clear-btn">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Admin: Poster Location</div>
+        <div class="admin-content admin-col">
+          <input type="text" id="map-poster-id" placeholder="Poster ID" />
+          <input type="text" id="map-label" placeholder="Label (optional)" />
+          <input type="text" id="map-lat" placeholder="Latitude" />
+          <input type="text" id="map-lng" placeholder="Longitude" />
+          <button id="save-location-btn">Save Location</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const TEAM_COLORS = [
+      "#00d9ff",
+      "#ff4d6d",
+      "#7ae582",
+      "#ffd166",
+      "#bf5fff",
+      "#ff8c42",
+      "#4cc9f0",
+      "#f72585"
+    ];
+
+    const MAX_LOG = 60;
+
+    const teamColor = (() => {
+      const cache = {};
+      let index = 0;
+      return (teamId) => {
+        if (!cache[teamId]) {
+          cache[teamId] = TEAM_COLORS[index % TEAM_COLORS.length];
+          index += 1;
+        }
+        return cache[teamId];
+      };
+    })();
+
+    const socket = io({ transports: ["polling", "websocket"] });
+    const map = L.map("poster-map", {
+      center: [44.4268, 26.1025],
+      zoom: 13,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19,
+      subdomains: "abcd",
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    }).addTo(map);
+
+    const markerLayer = L.layerGroup().addTo(map);
+
+    function now() {
+      return new Date().toTimeString().slice(0, 8);
+    }
+
+    function addLog(message, kind = "ev-stroke") {
+      const log = document.getElementById("event-log");
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      entry.innerHTML = `<span class="ts">${now()}</span><span class="${kind}">${message}</span>`;
+      log.prepend(entry);
+
+      while (log.children.length > MAX_LOG) {
+        log.lastElementChild.remove();
+      }
+    }
+
+    function renderLeaderboard(leaderboard) {
+      const el = document.getElementById("leaderboard");
+      if (!leaderboard.length) {
+        el.innerHTML = '<div style="color: var(--muted);">No data yet.</div>';
+        return;
+      }
+
+      el.innerHTML = leaderboard.slice(0, 8).map((entry, index) => `
+        <div class="lb-row">
+          <div class="lb-rank">${index + 1}</div>
+          <div>
+            <div style="color:${teamColor(entry.teamId)};font-weight:700;">${entry.teamId}</div>
+            <div class="lb-team-sub">${entry.postersOwned} poster${entry.postersOwned === 1 ? "" : "s"} owned</div>
+          </div>
+          <div class="lb-score">${entry.totalArea.toFixed(2)}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderPosters(posters) {
+      const grid = document.getElementById("poster-grid");
+      const empty = document.getElementById("empty-msg");
+
+      if (!posters.length) {
+        empty.style.display = "block";
+        grid.querySelectorAll(".poster-card").forEach((node) => node.remove());
+        return;
+      }
+
+      empty.style.display = "none";
+
+      const existing = {};
+      grid.querySelectorAll(".poster-card").forEach((node) => {
+        existing[node.dataset.id] = node;
+      });
+
+      posters.forEach((poster) => {
+        const territory = poster.territory || {};
+        const teams = Object.entries(territory.teams || {}).sort((a, b) => b[1] - a[1]);
+        const owner = territory.owner;
+        const contested = teams.length > 1 && (teams[0][1] - (teams[1]?.[1] || 0)) < 0.15;
+
+        const html = `
+          <div class="poster-id">${poster.id}</div>
+          <div class="owner-badge ${owner ? (contested ? "contested" : "owned") : "empty"}">
+            ${owner ? (contested ? "Contested" : owner) : "Unclaimed"}
+          </div>
+          <div class="territory-bars">
+            ${teams.slice(0, 5).map(([teamId, share]) => `
+              <div class="team-row">
+                <div class="team-name" title="${teamId}">${teamId}</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:${(share * 100).toFixed(1)}%;background:${teamColor(teamId)}"></div>
+                </div>
+                <div class="bar-pct">${(share * 100).toFixed(0)}%</div>
+              </div>
+            `).join("") || '<div style="color: var(--muted); font-size: 0.8rem;">No paint yet.</div>'}
+          </div>
+          <div class="meta-row">
+            <span>${poster.strokeCount} strokes</span>
+            <span>${poster.stickerCount} stickers</span>
+          </div>
+        `;
+
+        if (existing[poster.id]) {
+          existing[poster.id].innerHTML = html;
+        } else {
+          const card = document.createElement("div");
+          card.className = "poster-card";
+          card.dataset.id = poster.id;
+          card.innerHTML = html;
+          grid.appendChild(card);
+        }
+      });
+
+      const currentIds = new Set(posters.map((poster) => poster.id));
+      Object.keys(existing).forEach((id) => {
+        if (!currentIds.has(id)) {
+          existing[id].remove();
+        }
+      });
+    }
+
+    function renderMap(posters) {
+      markerLayer.clearLayers();
+      const markerBounds = [];
+
+      posters
+        .filter((poster) => poster.location && Number.isFinite(poster.location.lat) && Number.isFinite(poster.location.lng))
+        .forEach((poster) => {
+          const owner = poster.territory?.owner || null;
+          const teams = Object.entries(poster.territory?.teams || {}).sort((a, b) => b[1] - a[1]);
+          const color = owner ? teamColor(owner) : "#7f93b2";
+          const marker = L.circleMarker([poster.location.lat, poster.location.lng], {
+            radius: 12,
+            color,
+            fillColor: color,
+            fillOpacity: 0.85,
+            weight: 3,
+          });
+
+          marker.bindPopup(`
+            <div class="map-popup-title">${poster.location.label || poster.id}</div>
+            <div class="map-popup-sub">${poster.id}</div>
+            <div><strong>Owner:</strong> ${owner || "Unclaimed"}</div>
+            <div><strong>Strokes:</strong> ${poster.strokeCount} | <strong>Stickers:</strong> ${poster.stickerCount}</div>
+            <div style="margin-top:6px;">
+              ${teams.slice(0, 3).map(([teamId, share]) => `<div>${teamId}: ${(share * 100).toFixed(0)}%</div>`).join("") || "No paint yet."}
+            </div>
+          `);
+
+          marker.addTo(markerLayer);
+          markerBounds.push([poster.location.lat, poster.location.lng]);
+        });
+
+      if (markerBounds.length) {
+        map.fitBounds(markerBounds, { padding: [32, 32], maxZoom: 17 });
+      }
+    }
+
+    socket.on("connect", () => {
+      document.getElementById("conn-dot").classList.add("connected");
+      document.getElementById("conn-text").textContent = "Live";
+      addLog("Connected to server", "ev-join");
+    });
+
+    socket.on("disconnect", () => {
+      document.getElementById("conn-dot").classList.remove("connected");
+      document.getElementById("conn-text").textContent = "Disconnected";
+      addLog("Connection lost", "ev-clear");
+    });
+
+    socket.on("dashboard_update", (data) => {
+      document.getElementById("client-count").textContent = data.connectedClients ?? "-";
+      document.getElementById("poster-count").textContent = data.posters?.length ?? "-";
+      renderPosters(data.posters || []);
+      renderMap(data.posters || []);
+      renderLeaderboard(data.leaderboard || []);
+    });
+
+    socket.on("territory_update", ({ posterId, territory }) => {
+      if (territory?.owner) {
+        addLog(`${territory.owner} leads on ${posterId}`, "ev-take");
+      }
+    });
+
+    socket.on("canvas_cleared", ({ posterId }) => {
+      addLog(`Canvas cleared: ${posterId}`, "ev-clear");
+    });
+
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      const posterId = document.getElementById("clear-poster-id").value.trim();
+      if (!posterId) {
+        return;
+      }
+
+      const adminKey = prompt("Admin key:");
+      if (!adminKey) {
+        return;
+      }
+
+      socket.emit("clear_canvas", { posterId, adminKey }, (response) => {
+        addLog(
+          response.ok ? `Cleared ${posterId}` : `Clear failed: ${response.error}`,
+          response.ok ? "ev-clear" : "ev-stroke"
+        );
+      });
+    });
+
+    document.getElementById("save-location-btn").addEventListener("click", () => {
+      const posterId = document.getElementById("map-poster-id").value.trim();
+      const label = document.getElementById("map-label").value.trim();
+      const lat = Number(document.getElementById("map-lat").value);
+      const lng = Number(document.getElementById("map-lng").value);
+
+      if (!posterId || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+        addLog("Set location failed: posterId, lat, and lng are required", "ev-clear");
+        return;
+      }
+
+      fetch(`/api/posters/${encodeURIComponent(posterId)}/location`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label, lat, lng }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          addLog(
+            data.ok
+              ? `Saved location for ${posterId}`
+              : `Save location failed: ${data.error || "unknown error"}`,
+            data.ok ? "ev-join" : "ev-clear"
+          );
+        })
+        .catch(() => {
+          addLog("Save location failed: network error", "ev-clear");
+        });
+    });
+
+    fetch("/api/health")
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("health-info").textContent =
+          data.ok ? `Healthy: ${data.service}` : "Service reported an unhealthy state.";
+      })
+      .catch(() => {
+        document.getElementById("health-info").textContent = "Health check failed.";
+      });
+  </script>
+</body>
+</html>
