@@ -1,0 +1,31 @@
+.DS_Store
+
+# Xcode user and build state
+DerivedData/
+build/
+.build/
+*.xcarchive
+*.ipa
+*.dSYM
+*.xcuserdatad/
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcscmblueprint
+*.moved-aside
+
+# Logs and local temp artifacts
+*.log
+*.traceevents
+
+# Local-only backups
+back_up/
+
+# Unity exported runtime and generated compile artifacts
+BetterVersion/Data/**
+BetterVersion/Frameworks/**
+BetterVersion/Il2CppOutputProject/**
+BetterVersion/Il2CppTempDirArtifacts/**
+BetterVersion/**/*.a
+BetterVersion/**/*.app
+BetterVersion/**/*.framework/UnityRuntime
+BetterVersion/**/*.framework/_CodeSignature/

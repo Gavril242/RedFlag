@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4CE0C5DA2F788BE00008E0B8 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE0C5D92F788BE00008E0B8 /* UnityFramework.framework */; };
+		4CE0C5DB2F788BE00008E0B8 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE0C5D92F788BE00008E0B8 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4CF9DE4EA221D84E60049D9A1 /* Data in Resources */ = {isa = PBXBuildFile; fileRef = 4CF31BF961B55660D0013FB1B /* Data */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4CCA06D42F76FAB600D2A3E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -23,10 +29,28 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		4CE0C5DC2F788BE00008E0B8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4CE0C5DB2F788BE00008E0B8 /* UnityFramework.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		4CCA06C32F76FAB500D2A3E0 /* itechARapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = itechARapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CCA06D32F76FAB600D2A3E0 /* itechARappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = itechARappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CCA06DD2F76FAB600D2A3E0 /* itechARappUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = itechARappUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		07DFB55E751ECEA638D01EAC /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = BetterVersion/UnityFramework/UnityFramework.framework; sourceTree = "<group>"; };
+		4CD80A0B2F7887FD00228B80 /* itechARapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = itechARapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CD80A0C2F7887FD00228B80 /* itechARappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = itechARappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CD80A0D2F7887FD00228B80 /* itechARappUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = itechARappUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CD80A0E2F78893100228B80 /* Unity-iPhone.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Unity-iPhone.xcodeproj"; path = "../BetterVersion/Unity-iPhone.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		4CE0C5D92F788BE00008E0B8 /* UnityFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = UnityFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CF31BF961B55660D0013FB1B /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = ../BetterVersion/Data; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -65,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CE0C5DA2F788BE00008E0B8 /* UnityFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,22 +110,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4B2636C45896183178493ABE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4CE0C5D92F788BE00008E0B8 /* UnityFramework.framework */,
+				07DFB55E751ECEA638D01EAC /* UnityFramework.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4CCA06BA2F76FAB500D2A3E0 = {
 			isa = PBXGroup;
 			children = (
 				4CCA06C52F76FAB500D2A3E0 /* itechARapp */,
 				4CCA06D62F76FAB600D2A3E0 /* itechARappTests */,
+				4CD80A0E2F78893100228B80 /* Unity-iPhone.xcodeproj */,
 				4CCA06E02F76FAB600D2A3E0 /* itechARappUITests */,
 				4CCA06C42F76FAB500D2A3E0 /* Products */,
+				4CF31BF961B55660D0013FB1B /* Data */,
+				4B2636C45896183178493ABE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		4CCA06C42F76FAB500D2A3E0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4CCA06C32F76FAB500D2A3E0 /* itechARapp.app */,
-				4CCA06D32F76FAB600D2A3E0 /* itechARappTests.xctest */,
-				4CCA06DD2F76FAB600D2A3E0 /* itechARappUITests.xctest */,
+				4CD80A0B2F7887FD00228B80 /* itechARapp.app */,
+				4CD80A0C2F7887FD00228B80 /* itechARappTests.xctest */,
+				4CD80A0D2F7887FD00228B80 /* itechARappUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4CE0C5E12F788EC80008E0B8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,6 +159,7 @@
 				4CCA06BF2F76FAB500D2A3E0 /* Sources */,
 				4CCA06C02F76FAB500D2A3E0 /* Frameworks */,
 				4CCA06C12F76FAB500D2A3E0 /* Resources */,
+				4CE0C5DC2F788BE00008E0B8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -124,10 +169,8 @@
 				4CCA06C52F76FAB500D2A3E0 /* itechARapp */,
 			);
 			name = itechARapp;
-			packageProductDependencies = (
-			);
 			productName = itechARapp;
-			productReference = 4CCA06C32F76FAB500D2A3E0 /* itechARapp.app */;
+			productReference = 4CD80A0B2F7887FD00228B80 /* itechARapp.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4CCA06D22F76FAB600D2A3E0 /* itechARappTests */ = {
@@ -147,10 +190,8 @@
 				4CCA06D62F76FAB600D2A3E0 /* itechARappTests */,
 			);
 			name = itechARappTests;
-			packageProductDependencies = (
-			);
 			productName = itechARappTests;
-			productReference = 4CCA06D32F76FAB600D2A3E0 /* itechARappTests.xctest */;
+			productReference = 4CD80A0C2F7887FD00228B80 /* itechARappTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4CCA06DC2F76FAB600D2A3E0 /* itechARappUITests */ = {
@@ -170,10 +211,8 @@
 				4CCA06E02F76FAB600D2A3E0 /* itechARappUITests */,
 			);
 			name = itechARappUITests;
-			packageProductDependencies = (
-			);
 			productName = itechARappUITests;
-			productReference = 4CCA06DD2F76FAB600D2A3E0 /* itechARappUITests.xctest */;
+			productReference = 4CD80A0D2F7887FD00228B80 /* itechARappUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -211,6 +250,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4CCA06C42F76FAB500D2A3E0 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 4CE0C5E12F788EC80008E0B8 /* Products */;
+					ProjectRef = 4CD80A0E2F78893100228B80 /* Unity-iPhone.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				4CCA06C22F76FAB500D2A3E0 /* itechARapp */,
@@ -225,6 +270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CF9DE4EA221D84E60049D9A1 /* Data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,10 +336,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TS8NZUD9A4;
+				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(PROJECT_DIR)/BetterVersion/UnityFramework\"",
+					"\"$(PROJECT_DIR)/BetterVersion/Frameworks\"",
+				);
+				FUSE_BUILD_SCRIPT_PHASES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = itechARapp/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = CAMERA_USAGE_DESCRIPTION;
+				INFOPLIST_KEY_NSCameraUsageDescription = "RedFlag uses the camera to track posters and render AR territory overlays.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -303,14 +357,25 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(PROJECT_DIR)/BetterVersion/Libraries\"",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UnityFramework,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = RedFlagStudios.itechARapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "$(inherited) \"$(PROJECT_DIR)/BetterVersion/UnityFramework\"";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -325,10 +390,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TS8NZUD9A4;
+				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(PROJECT_DIR)/BetterVersion/UnityFramework\"",
+					"\"$(PROJECT_DIR)/BetterVersion/Frameworks\"",
+				);
+				FUSE_BUILD_SCRIPT_PHASES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = itechARapp/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = CAMERA_USAGE_DESCRIPTION;
+				INFOPLIST_KEY_NSCameraUsageDescription = "RedFlag uses the camera to track posters and render AR territory overlays.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -338,14 +411,26 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(PROJECT_DIR)/BetterVersion/Libraries\"",
 				);
 				MARKETING_VERSION = 1.0;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UnityFramework,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = RedFlagStudios.itechARapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "$(inherited) \"$(PROJECT_DIR)/BetterVersion/UnityFramework\"";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -411,6 +496,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -468,6 +554,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
