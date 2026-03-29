@@ -21,6 +21,7 @@ RedFlag is an iOS AR graffiti prototype built with SwiftUI, ARKit, RealityKit, a
 - `itechARapp/`: native iOS app source
 - `itechARapp.xcodeproj/`: main Xcode project
 - `BetterVersion/`: Unity iOS export and related Xcode project files
+- `patch_face_tracking.sh`: reapplies the Unity face-tracking stub patch after a fresh export
 - `itechARappTests/`, `itechARappUITests/`: test targets
 
 ## Backend Notes
